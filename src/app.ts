@@ -3,6 +3,7 @@ import errorHandler from "./middlewares/globalErrorHandler";
 import userRouter from "./user/userRouter";
 
 const app = express();
+app.use(express.json());
 
 app.get("/", (req, res) => {
    console.log(req.headers["user-agent"]);
