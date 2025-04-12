@@ -18,9 +18,11 @@
   "license": "ISC",
   "devDependencies": {
     "@eslint/js": "^9.24.0",
+    "@types/bcrypt": "^5.0.2",
     "@types/dotenv": "^8.2.3",
     "@types/express": "^5.0.1",
     "@types/http-errors": "^2.0.4",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^22.14.0",
     "eslint": "^9.24.0",
@@ -31,9 +33,11 @@
     "typescript-eslint": "^8.29.1"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "http-errors": "^2.0.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.13.2"
   }
 }
