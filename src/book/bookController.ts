@@ -2,22 +2,26 @@ import { NextFunction, Request, Response } from "express";
 import path from "node:path";
 import { cloudinary } from "../config/cloudinary";
 import createHttpError from "http-errors";
+import bookModel from "./bookModel";
+import fs from "node:fs";
 
 const createBook = async (req: Request, res: Response, next: NextFunction) => {
+   const { title, genre } = req.body;
+   if (!title || !genre) {
+      next(createHttpError(400, "All fields are required"));
+      return;
+   }
    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-
+   let uploadCoverResult, bookFileUploadRes;
+   let filePath, bookFilePath;
    try {
       const coverImageMimeType = files.coverImage[0].mimetype.split("/").at(-1); //eg: application/pdf
 
       const fileName = files.coverImage[0].filename;
 
-      const filePath = path.resolve(
-         __dirname,
-         "../../public/data/uploads",
-         fileName
-      );
+      filePath = path.resolve(__dirname, "../../public/data/uploads", fileName);
 
-      const uploadCoverResult = await cloudinary.uploader.upload(filePath, {
+      uploadCoverResult = await cloudinary.uploader.upload(filePath, {
          filename_override: fileName,
          folder: "book-covers",
          format: coverImageMimeType,
@@ -25,31 +29,41 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
       // console.log("upload cover image res: ", uploadCoverResult);
    } catch (err) {
       console.log("Error uploading Cover image: ", err);
-      // next(createHttpError(500, "Error uploading cover image"));
    }
    try {
       const bookFileName = files.file[0].filename;
 
-      const bookFilePath = path.resolve(
+      bookFilePath = path.resolve(
          __dirname,
          "../../public/data/uploads",
          bookFileName
       );
 
-      const bookFileUploadRes = await cloudinary.uploader.upload(bookFilePath, {
+      bookFileUploadRes = await cloudinary.uploader.upload(bookFilePath, {
          resource_type: "raw",
          filename_override: bookFileName,
          folder: "book-pdfs",
          format: "pdf",
       });
-
-      // console.log("file upload res: ", bookFileUploadRes);
-
-      res.json({ message: "Book created" });
    } catch (err) {
       console.log("error uploading file: ", err);
-
       next(createHttpError(500, "Error uploading pdf file"));
+   }
+   try {
+      const newBook = await bookModel.create({
+         title,
+         genre,
+         author: "67fa729ae5c658ea8ea83011",
+         coverImage: uploadCoverResult?.secure_url,
+         file: bookFileUploadRes?.secure_url,
+      });
+      // console.log("file upload res: ", bookFileUploadRes);
+      await fs.promises.unlink(filePath as string);
+      await fs.promises.unlink(bookFilePath as string);
+      res.status(201).json({ message: "Book created", id: newBook._id });
+   } catch (err) {
+      console.log("Error creating book", err);
+      next(createHttpError(500, "Error creating book"));
    }
 };
 
