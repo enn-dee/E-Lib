@@ -3,10 +3,12 @@ import { createBook } from "./bookController";
 import multer from "multer";
 import path from "node:path";
 const bookRouter = express.Router();
+
 const upload = multer({
    dest: path.resolve(__dirname, "../../public/data/uploads"),
-   limits: { fieldSize: 3e7 }, //30mb
+   limits: { fieldSize: 10 * 1024 * 1024 }, //10MB
 });
+
 bookRouter.post(
    "/",
    upload.fields([
@@ -15,4 +17,5 @@ bookRouter.post(
    ]),
    createBook
 );
+
 export default bookRouter;

@@ -11,8 +11,8 @@ export default defineConfig([
       rules: {
          "padding-line-between-statements": [
             "error",
-            { blankLine: "always", prev: "*", next: "*" },
-            { blankLine: "any", prev: "import", next: "import" },
+            // { blankLine: "always", prev: "*", next: "*" },
+            // { blankLine: "any", prev: "import", next: "import" },
          ],
       },
    },

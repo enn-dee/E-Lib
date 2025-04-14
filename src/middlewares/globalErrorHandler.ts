@@ -15,4 +15,5 @@ const errorHandler: ErrorRequestHandler = (
       errorStack: config.env === "development" ? err.stack : "",
    });
 };
+
 export default errorHandler;
